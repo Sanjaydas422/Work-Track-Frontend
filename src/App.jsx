@@ -1,29 +1,41 @@
-import React from 'react'
-import { BrowserRouter, createBrowserRouter, RouterProvider } from 'react-router-dom'
-import SignupPage from './pages/SignupPage'
-import LoginPage from './pages/LoginPage'
-import ErrorPage from './pages/ErrorPage'
+// App.jsx
+import React from "react";
+import { createBrowserRouter, RouterProvider, Navigate } from "react-router-dom";
 
-const App = () => {
-  const router=createBrowserRouter([
-    {
-      path:"/",
-      errorElement:<ErrorPage/>,
-      element:"",
+import SignupPage from "./pages/SignupPage";
+import LoginPage from "./pages/LoginPage";
+import ErrorPage from "./pages/ErrorPage";
+import Layout from "./components/layout/Layout";
+import Dashboard from "./pages/Dashboard";
 
-      children:[
-        {
-          index:true,
-          element:<SignupPage/>
-        },
-        {
-          path:"/login",
-          element:<LoginPage/>
-        }
-      ]
-    }
-  ])
-  return <RouterProvider router={router}/>
-}
+const router = createBrowserRouter([
+  {
+    path: "/auth",
+    errorElement: <ErrorPage />,
+    children: [
+      { index: true, element: <SignupPage /> },    // /auth
+      { path: "login", element: <LoginPage /> },   // /auth/login
+    ],
+  },
 
-export default App
+  {
+    path: "/",                 // <---- Layout route
+    element: <Layout />,       // sidebar + navbar fixed
+    errorElement: <ErrorPage />,
+
+    children: [
+      { index: true, element: <Dashboard /> },   // /
+      { path: "dashboard", element: "" }, // /dashboard
+
+      // You will add more pages here later:
+      // { path: "profile", element: <ProfilePage/> },
+      // { path: "settings", element: <SettingsPage/> },
+    ],
+  },
+
+  // unknown routes → redirect to "/"
+  // { path: "*", element: <Navigate to="/" replace /> }
+]);
+
+const App = () => <RouterProvider router={router} />;
+export default App;
