@@ -1,0 +1,73 @@
+/* Layout.css */
+
+/* constants */
+:root{
+  --sidebar-width: 300px;
+  --navbar-height: 58px;
+  --gutter: 16px;
+}
+
+/* sidebar fixed on the left */
+.app-sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: var(--sidebar-width);
+  min-width: var(--sidebar-width);
+  background: #ffffff;
+  border-right: 1px solid #e6e6e6;
+  z-index: 40;
+  overflow-y: auto; /* so sidebar can scroll if too tall */
+  padding: 12px;
+  box-shadow: 0 0 0 rgba(0,0,0,0); /* placeholder */
+}
+
+/* navbar fixed at top, but shifted right so it doesn't overlay the sidebar */
+.app-navbar {
+  position: fixed;
+  left: var(--sidebar-width); /* start after sidebar */
+  right: 0;
+  top: 0;
+  height: var(--navbar-height);
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  border-bottom: 1px solid #ddd;
+  background: #fff;
+  z-index: 50; /* above sidebar content if overlapping */
+  box-sizing: border-box;
+}
+
+/* main content area that sits to the right of sidebar and below navbar */
+.app-main {
+  /* push content to the right of the sidebar */
+  margin-left: var(--sidebar-width);
+  /* push content below the navbar */
+  margin-top: var(--navbar-height);
+  /* fill remaining height and make scrollable */
+  height: calc(100vh - var(--navbar-height));
+  overflow-y: auto;
+  padding: calc(var(--gutter) * 1) var(--gutter) var(--gutter) var(--gutter);
+  box-sizing: border-box;
+  background: #f7f7f7;
+}
+
+/* optional: make sure the content inside main is not wider than the viewport minus sidebar */
+.app-main > * {
+  max-width: calc(100% - 0px);
+}
+
+/* small responsive tweak: collapse sidebar on small screens */
+@media (max-width: 900px) {
+  :root { --sidebar-width: 0px; }
+  .app-sidebar {
+    display: none; /* or you can transform it to an overlay drawer */
+  }
+  .app-navbar {
+    left: 0;
+  }
+  .app-main {
+    margin-left: 0;
+  }
+}

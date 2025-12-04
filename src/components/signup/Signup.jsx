@@ -1,8 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
 import "./Signup.css";
 
 const Signup = () => {
-  return (
+  const[activeTab,setActiveTab]=useState("signup")
+
+  
+
+      return (
     <div className="signupmain">
       <div className="signupcontainer">
         <div className="signup-left-section">

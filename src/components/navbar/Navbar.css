@@ -1,0 +1,108 @@
+nav {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  background-color: #FAF4FC;
+  align-items: center;
+  text-align: center;
+  width: 100%;
+  height: 58px; /* matches --navbar-height */
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 2000; /* stays above sidebar */
+}
+
+.left-nav {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.tron-logo {
+  width: 40px;
+  height: 40px;
+  margin-left: 50px;
+}
+
+.tron-logo2 {
+  width: 80px;
+  height: 40px;
+}
+
+.search-box {
+  display: flex;
+  background-color: white;
+  border-radius: 20px;
+  width: 500px;
+  height: 35px;
+  padding: 7px 10px;
+  gap: 5px;
+  align-items: center;
+}
+
+.search-icon {
+  height: 22px;
+  width: 25px;
+}
+
+input {
+  border: none;
+  outline: none;
+  font-size: 16px;
+  width: 100%;
+}
+
+.notification-box {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.notification-icon {
+  height: 30px;
+  width: 25px;
+}
+
+.notification-text {
+  font-size: large;
+}
+
+.profile-container {
+  position: relative;
+  display: inline-block;
+}
+
+.profile-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.dropdown-box {
+  position: absolute;
+  top: 50px;
+  right: 0;
+  background: white;
+  border: 1px solid #ccc;
+  width: 140px;
+  border-radius: 5px;
+  padding: 8px 0;
+  text-align: left;
+}
+
+.dropdown-box p {
+  margin: 0;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.dropdown-box p:hover {
+  background-color: #f0f0f0;
+}
+
+.logout {
+  color: red;
+  font-weight: 600;
+}
