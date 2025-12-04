@@ -39,6 +39,9 @@ const Navbar = () => {
     </div>
             </div>
             <div className="hell">hello hai how are you</div>
+
+            
+
      </nav>
   )
 }
