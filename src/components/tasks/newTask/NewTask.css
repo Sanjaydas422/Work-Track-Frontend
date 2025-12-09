@@ -97,12 +97,13 @@ border-radius: 2px;
   align-items: center;
   justify-content: center;    
 }
-.form-buttons {
+.form-buttons{
   width: 100%;
   display: flex;
   justify-content: flex-end;  
   gap: 12px;                  
   margin-top: 30px;  
+  margin-right: 30px;
        
 }
 
@@ -125,5 +126,5 @@ border-radius: 2px;
   cursor: pointer;
   width: 100px;
   height: 40px; 
-
+ 
 }

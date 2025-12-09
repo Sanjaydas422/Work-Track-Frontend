@@ -1,9 +1,9 @@
 import React from 'react'
-
+import './NewTask.css'
 const NewTask = () => {
   return (
-    <div>
-        <div className="newtask-title">
+    <>
+    <div className="newtask-title">
             New Task
         </div>
     <div className="newtask-container">
@@ -24,7 +24,7 @@ const NewTask = () => {
 
         <div className="newtask-rightform">
            <form action="">
-                <label htmlFor=""> Assigned To</label> <br />
+                <label htmlFor="">Assigned to</label> <br />
                 <textarea className='newtask-input'></textarea>
 
                  <div className="date-hour">
@@ -62,7 +62,7 @@ const NewTask = () => {
   <button className="save-btn">Save</button>
 </div>
 
-    </div>
+    </>
   )
 }
 
