@@ -1,6 +1,5 @@
 // src/components/auth/Login.jsx
 import React, { useState } from "react";
-import "./login.css";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../../api/api";
 import { toast } from "react-toastify";
