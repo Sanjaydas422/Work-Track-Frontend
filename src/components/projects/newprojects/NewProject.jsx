@@ -1,12 +1,9 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import "./NewProject.css";
-import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import api from "../../../api/api";
 
 const NewProject = () => {
-  // const navigate=useNavigate();
-
   const [formData, setFormData] = useState({
     project_name: "",
     company_name: "",
@@ -16,59 +13,54 @@ const NewProject = () => {
     est_hr: "",
     priority: "",
     links: "",
-    // attachments will be handled separately as File[]
   });
 
-  const [attachments, setAttachments] = useState([]); // File[]
+  const [attachments, setAttachments] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showLinkInput, setShowLinkInput] = useState(false);
-
+  const [users, setUsers] = useState([]);          // <-- USERS STATE
   const fileInputRef = useRef(null);
+
+  // ---------- FETCH USERS ----------
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const res = await api.get("admin_app/users");  // same API used in tasks
+        setUsers(res.data);
+      } catch (err) {
+        toast.error("Failed to load users");
+      }
+    };
+
+    fetchUsers();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  // Trigger file chooser
-  const handleAttachmentClick = () => {
-    if (fileInputRef.current) fileInputRef.current.click();
-  };
+  const handleAttachmentClick = () => fileInputRef.current?.click();
 
-  // When files are chosen
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files || []);
-    // optional: dedupe by name
-    setAttachments((prev) => {
-      const combined = [...prev, ...files];
-      // remove duplicates by name+size
-      const unique = [];
-      const keys = new Set();
-      combined.forEach((f) => {
-        const k = `${f.name}_${f.size}`;
-        if (!keys.has(k)) {
-          keys.add(k);
-          unique.push(f);
-        }
-      });
-      return unique;
-    });
-    // clear input value so same file can be selected again if removed
+    setAttachments(prev => [...prev, ...files]);
     e.target.value = null;
   };
 
-  const handleRemoveAttachment = (index) => {
-    setAttachments((prev) => prev.filter((_, i) => i !== index));
+  const handleRemoveAttachment = (i) => {
+    setAttachments(prev => prev.filter((_, index) => index !== i));
   };
 
-  // Link icon click: open link if present, otherwise toggle input
   const handleLinkIconClick = () => {
-    if (formData.links && formData.links.trim() !== "") {
-      const url = formData.links.match(/^https?:\/\//) ? formData.links : `https://${formData.links}`;
-      window.open(url, "_blank", "noopener,noreferrer");
+    if (formData.links?.trim()) {
+      const url = formData.links.startsWith("http")
+        ? formData.links
+        : `https://${formData.links}`;
+      window.open(url, "_blank");
       return;
     }
-    setShowLinkInput((s) => !s);
+    setShowLinkInput(s => !s);
   };
 
   const validateRequired = () => {
@@ -87,31 +79,25 @@ const NewProject = () => {
     try {
       setLoading(true);
 
-      // prepare multipart form data
       const payload = new FormData();
       payload.append("project_name", formData.project_name);
       payload.append("company_name", formData.company_name);
       payload.append("description", formData.description);
-      payload.append("assigned_by", formData.assigned_by);
+
+      // ---------- MAIN IMPORTANT ----------
+      payload.append("assigned_by", formData.assigned_by);   // USER ID GOING
+      // ------------------------------------
+
       payload.append("due_date", formData.due_date);
       payload.append("est_hr", formData.est_hr);
       payload.append("priority", formData.priority || "");
       payload.append("links", formData.links || "");
 
-      // Append attachments. Backend typically accepts repeated keys for multiple files.
-      // If your backend expects `attachments[]` change the key accordingly.
-      attachments.forEach((file) => {
-        payload.append("attachments", file);
-      });
+      attachments.forEach(f => payload.append("attachments", f));
 
-      const res = await api.post("/admin_app/add_projects", payload, {
-        headers: {
-          // Let axios set Content-Type (multipart boundary) automatically
-        },
-      });
+      const res = await api.post("/admin_app/add_projects", payload);
+      toast.success(res.data?.message || "Project Added Successfully");
 
-      toast.success(res.data?.message || "Successfully added new project");
-      // reset
       setFormData({
         project_name: "",
         company_name: "",
@@ -122,11 +108,12 @@ const NewProject = () => {
         priority: "",
         links: "",
       });
+
       setAttachments([]);
       setShowLinkInput(false);
-    } catch (error) {
-      const msg = error.response?.data?.error || error.message || "Added new project failed";
-      toast.error(msg);
+
+    } catch (err) {
+      toast.error("Project Add Failed");
     } finally {
       setLoading(false);
     }
@@ -136,9 +123,9 @@ const NewProject = () => {
     <>
       <div className="newproject-title">New Project</div>
 
-      {/* single form for the whole layout */}
-      <form className="newproject-container" onSubmit={handleSubmit} encType="multipart/form-data" noValidate>
+      <form className="newproject-container" onSubmit={handleSubmit}>
         <div className="newproject-leftform">
+
           <label>Project Name</label>
           <input
             type="text"
@@ -158,22 +145,43 @@ const NewProject = () => {
           />
 
           <label>Description</label>
-          <textarea className="description" name="description" value={formData.description} onChange={handleChange} />
+          <textarea
+            className="description"
+            name="description"
+            value={formData.description}
+            onChange={handleChange}
+          />
         </div>
 
         <div className="newproject-rightform">
-          <label>Assigned to</label>
-          <textarea
-            className="newproject-input"
+
+          {/* -------- ASSIGNED TO DROPDOWN -------- */}
+          <label>Assigned To</label>
+          <select
             name="assigned_by"
+            className="newproject-input"
             value={formData.assigned_by}
             onChange={handleChange}
-          />
+          >
+            <option value="">Select User</option>
+
+            {users.map(u => (
+              <option key={u.id} value={u.id}>
+                {u.first_name || u.email}
+              </option>
+            ))}
+          </select>
 
           <div className="date-hour">
             <div className="dates">
               <label>Due Date</label>
-              <input type="date" className="date" name="due_date" value={formData.due_date} onChange={handleChange} />
+              <input
+                type="date"
+                className="date"
+                name="due_date"
+                value={formData.due_date}
+                onChange={handleChange}
+              />
             </div>
 
             <div className="est-hour">
@@ -188,6 +196,9 @@ const NewProject = () => {
               />
             </div>
           </div>
+
+
+
 
           <div className="priority-link-project">
             <div className="project-priority">

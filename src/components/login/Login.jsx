@@ -33,12 +33,20 @@ const Login = () => {
       toast.success(res.data?.message || "Login successful");
 
       // Save tokens / user as you need (example localStorage)
+// Save tokens / user
       if (res.data?.access) localStorage.setItem("access", res.data.access);
       if (res.data?.refresh) localStorage.setItem("refresh", res.data.refresh);
       if (res.data?.user) localStorage.setItem("user", JSON.stringify(res.data.user));
 
-      // redirect to dashboard or home
-      navigate("/dashboard");
+      // ---------- ROLE BASED REDIRECT ----------
+      const role = res.data?.user?.role;
+
+      if (role === "admin" || role === "project_lead") {
+        navigate("/dashboard");     // Admin Dashboard
+      } else {
+        window.location.href = "http://localhost:5174/";
+      }
+
     } catch (err) {
       const msg = err.response?.data?.error || err.response?.data?.detail || err.message || "Login failed";
       toast.error(msg);

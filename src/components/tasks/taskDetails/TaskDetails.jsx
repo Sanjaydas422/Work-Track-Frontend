@@ -62,7 +62,7 @@ const TaskDetails = () => {
         <aside className="task-right">
           <div className="right-block">
             <div className="mini-label">Assigned to</div>
-            <div className="right-value">{task.assigned_by}</div>
+            <div className="right-value">{task.assignedto}</div>
           </div>
 
           <div className="two-col">

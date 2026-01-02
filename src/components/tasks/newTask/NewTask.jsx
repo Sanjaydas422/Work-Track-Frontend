@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./NewTask.css";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -8,14 +8,29 @@ const NewTask = () => {
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
+  const [users, setUsers] = useState([]);
+
   const [formData, setFormData] = useState({
     taskName: "",
     description: "",
-    assignedBy: "",
+    assignedto: "",
     dueDate: "",
     workingHours: "",
     priority: "",
   });
+
+  // -------- FETCH USERS ----------
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const res = await api.get("admin_app/users");
+        setUsers(res.data);
+      } catch (err) {
+        toast.error("Failed to load users");
+      }
+    };
+    fetchUsers();
+  }, []);
 
   const handleChange = (e) => {
     setFormData({
@@ -29,7 +44,7 @@ const NewTask = () => {
       !formData.taskName ||
       !formData.priority ||
       !formData.dueDate ||
-      !formData.assignedBy
+      !formData.assignedto
     ) {
       toast.error("Please fill all required fields");
       return;
@@ -41,21 +56,22 @@ const NewTask = () => {
       const data = new FormData();
       data.append("task-name", formData.taskName);
       data.append("description", formData.description);
-      data.append("assigned-by", formData.assignedBy);
       data.append("due-date", formData.dueDate);
       data.append("working-hours", formData.workingHours);
       data.append("priority", formData.priority);
       data.append("status", "Pending");
 
-      const response = await api.post("admin_app/add_tasks", data);
+      // ---------- MAIN PART ----------
+      data.append("assigned-to", formData.assignedto);
 
-      if (response.status === 200 || response.status === 201) {
+      const res = await api.post("admin_app/add_tasks", data);
+
+      if (res.status === 200 || res.status === 201) {
         toast.success("Task added successfully");
         navigate("/tasks");
       }
     } catch (error) {
       toast.error("Failed to add task");
-      console.error(error);
     } finally {
       setLoading(false);
     }
@@ -86,14 +102,23 @@ const NewTask = () => {
         </div>
 
         <div className="newtask-rightform">
-          <label>Assigned to *</label>
-          <input
-            type="text"
-            name="assignedBy"
+          <label>Assigned To *</label>
+
+          {/* USER DROPDOWN */}
+          <select
+            name="assignedto"
             className="newtask-input"
-            value={formData.assignedBy}
+            value={formData.assignedto}
             onChange={handleChange}
-          />
+          >
+            <option value="">Select User</option>
+
+            {users.map((u) => (
+              <option key={u.id} value={u.id}>
+                {u.first_name || u.email}
+              </option>
+            ))}
+          </select>
 
           <div className="date-hour">
             <div>
@@ -145,11 +170,7 @@ const NewTask = () => {
           Cancel
         </button>
 
-        <button
-          className="save-btn"
-          onClick={handleSubmit}
-          disabled={loading}
-        >
+        <button className="save-btn" onClick={handleSubmit} disabled={loading}>
           {loading ? "Saving..." : "Save"}
         </button>
       </div>

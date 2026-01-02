@@ -59,7 +59,7 @@ const TaskSummary = () => {
             <th>Priority</th>
             <th>Due Date</th>
             <th>Status</th>
-            <th>Assigned By</th>
+            <th>Assigned To</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -90,7 +90,14 @@ const TaskSummary = () => {
           {task.status}
         </td>
 
-        <td>{task.assigned_by}</td>
+        <td>
+            {task.assigned_to?.length > 0
+              ? task.assigned_to
+                  .map((u) => `${u.first_name} ${u.last_name}`)
+                  .join(", ")
+              : "Not Assigned"}
+        </td>
+
 
         <td className="actions">
           ...
