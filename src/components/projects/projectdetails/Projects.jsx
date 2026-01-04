@@ -43,17 +43,15 @@ useEffect(() => {
   /* =========================
      Close action menu on outside click
   ========================= */
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (menuRef.current && !menuRef.current.contains(e.target)) {
-        setOpenIndex(null);
-      }
-    };
+ useEffect(() => {
+  const handleClickOutside = () => {
+    setOpenIndex(null);
+  };
 
-    document.addEventListener("mousedown", handleClickOutside);
-    return () =>
-      document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  document.addEventListener("click", handleClickOutside);
+  return () => document.removeEventListener("click", handleClickOutside);
+}, []);
+
 
   /* =========================
      Button handlers
@@ -71,6 +69,32 @@ useEffect(() => {
   const toggleMenu = (index) => {
     setOpenIndex((prev) => (prev === index ? null : index));
   };
+
+  const handleDelete = async (id) => {
+  if (!window.confirm("Are you sure you want to delete this project?")) return;
+
+  try {
+    const res = await fetch(
+      `http://127.0.0.1:8000/admin_app/delete_projects/${id}/`,
+      { method: "DELETE" }
+    );
+
+    const data = await res.json();
+
+    if (res.ok) {
+      alert("Deleted Successfully");
+      setProjects(prev => prev.filter(p => p.id !== id));
+        setOpenIndex(null);
+    } else {
+      alert(data.error || "Delete failed");
+    }
+
+  } catch (err) {
+    console.error(err);
+    alert("Server error");
+  }
+};
+
 
   return (
     <div className="project-container">
@@ -134,15 +158,19 @@ useEffect(() => {
               Actions
           ========================= */}
           <div className="three-dot-wrapper" ref={menuRef}>
-            <div
-              className="three-dot"
-              onClick={() => toggleMenu(index)}
-            >
+                <div
+        className="three-dot"
+        onClick={(e) => {
+          e.stopPropagation();
+          toggleMenu(index);
+        }}
+      >
+
               <img src="/3 dot.svg" alt="menu" />
             </div>
 
             {openIndex === index && (
-              <div className="menu-popup">
+              <div className="menu-popup" onClick={(e) => e.stopPropagation()}>
                 <NavLink
                   to={`/projectdetail/${proj.id}`}
                   onClick={() => setOpenIndex(null)}
@@ -151,8 +179,19 @@ useEffect(() => {
                 </NavLink>
 
                 <p onClick={() => setOpenIndex(null)}>Edit</p>
+
+                <p
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDelete(proj.id);
+                  }}
+                >
+                  Delete
+                </p>
+
               </div>
             )}
+
           </div>
         </div>
       ))}

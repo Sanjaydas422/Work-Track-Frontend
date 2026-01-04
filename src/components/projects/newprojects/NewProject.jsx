@@ -2,8 +2,12 @@ import React, { useRef, useEffect, useState } from "react";
 import "./NewProject.css";
 import { toast } from "react-toastify";
 import api from "../../../api/api";
+import { useNavigate } from "react-router-dom";
 
 const NewProject = () => {
+  const navigate = useNavigate();
+
+
   const [formData, setFormData] = useState({
     project_name: "",
     company_name: "",
@@ -97,6 +101,7 @@ const NewProject = () => {
 
       const res = await api.post("/admin_app/add_projects", payload);
       toast.success(res.data?.message || "Project Added Successfully");
+      navigate("/projects");   // your project list route
 
       setFormData({
         project_name: "",

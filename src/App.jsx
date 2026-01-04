@@ -45,7 +45,7 @@ const router = createBrowserRouter([
       {path: "kanbanBoard", element: <KanbanBoardPage/>},
       {path: "newtask", element:<NewTaskPage/>},
       {path: "responsive", element:<ResponsiveLayout/>},
-      {path: "taskdetails", element:<TaskDetailsPage/>}
+      {path: "/taskdetails/:id", element:<TaskDetailsPage/>}
       
     ],
      

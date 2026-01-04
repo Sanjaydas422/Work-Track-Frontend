@@ -33,73 +33,97 @@ const TaskDetails = () => {
 
   return (
     <div className="taskdetails-page">
-      <div className="taskdetails-titlebox">
-        <p className="taskdetails-text">Task Details</p>
-      </div>
 
-      <div className="taskdetails-grid">
+      <nav className="header-strip">
+        Task Details
+      </nav>
+
+      <div className="task-main-container">
+
+        {/* LEFT SIDE */}
         <div className="task-left">
-          <div className="section">
-            <label className="label">Task Name</label>
-            <input
-              className="taskname-input"
-              value={task.task_name}
-              disabled
-            />
+
+          <div className="field-block">
+            <label>Task Name</label>
+            <input value={task.task_name} disabled />
           </div>
 
-          <div className="section">
-            <label className="label">Description</label>
-            <textarea
-              className="textarea"
-              rows="6"
-              value={task.description || ""}
-              disabled
-            />
+          <div className="field-block">
+            <label>Description</label>
+            <textarea value={task.description || ""} rows="5" disabled />
           </div>
+
+          <div className="discussion-block">
+            <label>Discussion</label>
+            <div className="discussion-card">
+              <div className="avatar">D</div>
+              <textarea
+                placeholder="Add a comment"
+                className="comment-box"
+                disabled
+              />
+            </div>
+          </div>
+
         </div>
 
-        <aside className="task-right">
-          <div className="right-block">
-            <div className="mini-label">Assigned to</div>
-            <div className="right-value">{task.assignedto}</div>
+        {/* RIGHT PANEL */}
+        <div className="task-right">
+
+          <div className="right-row">
+            <p className="label">Assigned To</p>
+            <p className="value">{task.assignedto || "—"}</p>
           </div>
 
           <div className="two-col">
             <div>
-              <div className="mini-label">Priority</div>
-              <div className={`priority-badge ${task.priority.toLowerCase()}`}>
+              <p className="label">Priority</p>
+              <span className={`priority-badge ${task.priority?.toLowerCase()}`}>
                 {task.priority}
-              </div>
+              </span>
             </div>
 
             <div>
-              <div className="mini-label">Due Date</div>
-              <div className="right-value">{task.due_date}</div>
+              <p className="label">Due Date</p>
+              <p className="value">{task.due_date}</p>
             </div>
           </div>
 
           <div className="two-col">
             <div>
-              <div className="mini-label">Status</div>
-              <div className="right-value">{task.status}</div>
+              <p className="label">Status</p>
+              <p className="value">{task.status}</p>
             </div>
 
             <div>
-              <div className="mini-label">Effort Hours</div>
-              <div className="right-value">
-                {task.working_hours || "—"}
-              </div>
+              <p className="label">Effort Hours</p>
+              <p className="value">{task.working_hours || "—"}</p>
             </div>
           </div>
-        </aside>
+
+          <div className="two-col">
+            <div>
+              <p className="label">Links</p>
+              <button className="icon-btn">🔗</button>
+            </div>
+
+            <div>
+              <p className="label">Attachments</p>
+              <button className="icon-btn">📎</button>
+            </div>
+          </div>
+
+        </div>
       </div>
 
-      <div className="action-row">
-        <button className="btn cancel" onClick={() => navigate("/tasks")}>
-          Back
+      {/* ACTION BUTTONS */}
+      <div className="actions">
+        <button className="cancel" onClick={() => navigate("/tasks")}>
+          Cancel
         </button>
+        <button className="save">Save</button>
       </div>
+
     </div>
   );
 };

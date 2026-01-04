@@ -121,7 +121,17 @@ tbody tr:hover {
 
 
 .actions {
-  text-align: right;
+  text-align: center;
+  display:flex;
+ gap: 9px;
+ cursor: pointer;
+  
+  
+}
+.actions img{
+  height: 30px;
+  width: 20px;
+ 
 }
 
 .action-menu {

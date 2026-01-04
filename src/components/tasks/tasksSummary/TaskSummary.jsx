@@ -1,8 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
 import "./TaskSummary.css";
+import { useNavigate } from "react-router-dom";
 import api from "../../../api/api";
 
 const TaskSummary = () => {
+  const navigate = useNavigate();
   const [tasks, setTasks] = useState([]);
   const [openMenuIndex, setOpenMenuIndex] = useState(null);
   const [search, setSearch] = useState("");
@@ -48,6 +50,25 @@ const TaskSummary = () => {
   const toggleMenu = (index) => {
     setOpenMenuIndex(openMenuIndex === index ? null : index);
   };
+  const handleDelete = async (id) => {
+  if (!window.confirm("Are you sure you want to delete this task?")) return;
+
+  try {
+    const res = await api.delete(`admin_app/delete_tasks/${id}/`);
+
+    if (res.status === 200) {
+      alert("Task deleted successfully");
+      setTasks(prev => prev.filter(task => task.id !== id));
+    } else {
+      alert("Delete failed");
+    }
+
+  } catch (err) {
+    console.error("Delete error:", err);
+    alert("Server error");
+  }
+};
+
 
   return (
  <>
@@ -100,7 +121,9 @@ const TaskSummary = () => {
 
 
         <td className="actions">
-          ...
+              <img onClick={() => navigate(`/taskdetails/${task.id}`)} src="edit-3-svgrepo-com.svg" alt="" />
+              <img onClick={() => handleDelete(task.id)} src="delete 2.svg" alt="" />
+            
         </td>
       </tr>
     ))
