@@ -49,7 +49,7 @@ const WorkDetails = () => {
             <img src="\Group.svg" alt="At work" />
             <p>At Work</p>
           </div>
-          <NavLink to="/workersdetail">
+          <NavLink to="/users">
             <div className="viewall-head">View all</div>
           </NavLink>
         </div>

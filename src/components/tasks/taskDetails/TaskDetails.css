@@ -162,6 +162,10 @@
   cursor: pointer;
 }
 
+.user-select {
+
+  color: #d54a5c;
+}
 
 /******** ACTION BUTTONS *********/
 

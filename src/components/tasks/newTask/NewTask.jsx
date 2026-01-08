@@ -6,7 +6,6 @@ import api from "../../../api/api";
 
 const NewTask = () => {
   const navigate = useNavigate();
-
   const [loading, setLoading] = useState(false);
   const [users, setUsers] = useState([]);
 
@@ -19,13 +18,13 @@ const NewTask = () => {
     priority: "",
   });
 
-  // -------- FETCH USERS ----------
+  // ✅ FETCH CLEAN USER LIST
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const res = await api.get("admin_app/users");
+        const res = await api.get("/admin_app/users/list/");
         setUsers(res.data);
-      } catch (err) {
+      } catch {
         toast.error("Failed to load users");
       }
     };
@@ -33,10 +32,7 @@ const NewTask = () => {
   }, []);
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async () => {
@@ -60,17 +56,15 @@ const NewTask = () => {
       data.append("working-hours", formData.workingHours);
       data.append("priority", formData.priority);
       data.append("status", "Pending");
-
-      // ---------- MAIN PART ----------
       data.append("assigned-to", formData.assignedto);
 
-      const res = await api.post("admin_app/add_tasks", data);
+      const res = await api.post("/admin_app/add_tasks", data);
 
-      if (res.status === 200 || res.status === 201) {
+      if (res.status === 201) {
         toast.success("Task added successfully");
         navigate("/tasks");
       }
-    } catch (error) {
+    } catch {
       toast.error("Failed to add task");
     } finally {
       setLoading(false);
@@ -104,7 +98,6 @@ const NewTask = () => {
         <div className="newtask-rightform">
           <label>Assigned To *</label>
 
-          {/* USER DROPDOWN */}
           <select
             name="assignedto"
             className="newtask-input"
@@ -112,7 +105,6 @@ const NewTask = () => {
             onChange={handleChange}
           >
             <option value="">Select User</option>
-
             {users.map((u) => (
               <option key={u.id} value={u.id}>
                 {u.first_name || u.email}
@@ -139,7 +131,6 @@ const NewTask = () => {
                 name="workingHours"
                 className="esthour"
                 min="0"
-                placeholder="0"
                 value={formData.workingHours}
                 onChange={handleChange}
               />
@@ -162,14 +153,9 @@ const NewTask = () => {
       </div>
 
       <div className="form-buttons">
-        <button
-          className="cancel-btn"
-          onClick={() => navigate("/tasks")}
-          disabled={loading}
-        >
+        <button className="cancel-btn" onClick={() => navigate("/tasks")}>
           Cancel
         </button>
-
         <button className="save-btn" onClick={handleSubmit} disabled={loading}>
           {loading ? "Saving..." : "Save"}
         </button>

@@ -21,36 +21,56 @@ import NewTaskPage from "./pages/NewTaskPage";
 import ResponsiveLayout from "./pages/ResponsiveLayout";
 import TaskDetailsPage from "./pages/TaskDetailsPage";
 import { ToastContainer } from "react-toastify";
-
+import AdminAuthGuard from "./auth/AdminAuthGuard";
+import Users from "./pages/UsersPage";
 
 const App = () =>{
 const router = createBrowserRouter([
   {
-    path: "/",
-    errorElement: <ErrorPage />,
-    element: <Layout />,       // sidebar + navbar fixed
-    children: [
-      { index:true, element:<Dashboard /> },  
-      {path: "dashboard", element: <Dashboard />},    
-      {path:"workersdetail",element:<DashboardWorkDetails/>},
-      {path: "tasks", element: <TaskPage/>},
-      {path:"projects",element:<ProjectsPage/>},
-      {path:"newproject",element:<NewProjectPage/>},
-      {path:"projectdetail/:id",element:<ProjectDetailPage/>},
-      {path:"productivity",element:<Productivity/>},
-      {path:"/employeeproductivity/:id",element:<EmployeeProductivityPage/>},
-      {path: "report", element: <ReportPage/>},
-      {path: "settings", element: <SettingsPage/>},
-      {path:"notifications",element:<NotificationsPage/>},
-      {path: "kanbanBoard", element: <KanbanBoardPage/>},
-      {path: "newtask", element:<NewTaskPage/>},
-      {path: "responsive", element:<ResponsiveLayout/>},
-      {path: "/taskdetails/:id", element:<TaskDetailsPage/>}
-      
-    ],
-     
-  },
-      {path:"/signup",element:<SignupPage/>},
+  path: "/",
+  element: (
+    <AdminAuthGuard>
+      <Layout />
+    </AdminAuthGuard>
+  ),
+  errorElement: <ErrorPage />,
+  children: [
+    { index: true, element: <Dashboard /> },
+    { path: "dashboard", element: <Dashboard /> },
+    { path: "workersdetail", element: <DashboardWorkDetails /> },
+    { path: "tasks", element: <TaskPage /> },
+    { path: "projects", element: <ProjectsPage /> },
+    { path: "newproject", element: <NewProjectPage /> },
+    { path: "projectdetail/:id", element: <ProjectDetailPage /> },
+    { path: "productivity", element: <Productivity /> },
+    { path: "employeeproductivity/:id", element: <EmployeeProductivityPage /> },
+    { path: "report", element: <ReportPage /> },
+    { path: "settings", element: <SettingsPage /> },
+    { path: "notifications", element: <NotificationsPage /> },
+    { path: "kanbanBoard", element: <KanbanBoardPage /> },
+    { path: "newtask", element: <NewTaskPage /> },
+    { path: "responsive", element: <ResponsiveLayout /> },
+    { path: "taskdetails/:id", element: <TaskDetailsPage /> },
+    { path: "users", element: <Users /> },
+    {
+  path: "users/create",
+  element: <SignupPage />
+}
+
+  ],
+},
+{
+  path: "/signup",
+  element: (
+    <Navigate
+      to="/login"
+      replace
+      state={{
+        reason: "signup-disabled"
+      }}
+    />
+  )
+},
       { path: "/login", element: <LoginPage /> }, 
   
 ]);
