@@ -1,0 +1,143 @@
+.users-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  padding: 20px;
+}
+
+.users-page{
+    padding: 50px;
+    padding-top: 30px;
+    font-family: Inter, sans-serif;
+}
+.users-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 10px;
+  min-width: 900px;
+}
+
+.users-table thead th {
+  text-align: left;
+  font-weight: 600;
+  padding: 12px;
+  color: #444;
+}
+
+.users-table tbody tr {
+  background: #fff;
+  border-radius: 8px;
+}
+
+.users-table tbody tr:nth-child(1) {
+  background: #f6e9ff; /* highlighted row like image */
+}
+
+.users-table td {
+  padding: 14px;
+  vertical-align: middle;
+}
+
+.user-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+}
+
+/* STATUS BADGES */
+.status {
+  padding: 6px 12px;
+  border-radius: 12px;
+  font-size: 13px;
+  text-transform: capitalize;
+}
+
+.status.in-progress {
+  background: #e6f0ff;
+  color: #0057ff;
+}
+
+.status.pending {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.status.to-do {
+  background: #f1f1f1;
+  color: #555;
+}
+
+.status.task-done {
+  background: #d4edda;
+  color: #155724;
+}
+
+/* PRIORITY BADGES */
+.priority {
+  padding: 6px 12px;
+  border-radius: 14px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.priority.high {
+  background: #ffd6dc;
+  color: #b00020;
+}
+
+.priority.medium {
+  background: #d9f7d6;
+  color: #2e7d32;
+}
+
+.priority.low {
+  background: #dde7ff;
+  color: #1e40af;
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+  .users-table {
+    min-width: 100%;
+  }
+
+  .users-table thead {
+    display: none;
+  }
+
+  .users-table tbody tr {
+    display: block;
+    margin-bottom: 16px;
+  }
+
+  .users-table td {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+  }
+}
+.users-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.add-user-btn {
+  background: #4f46e5;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.add-user-btn:hover {
+  background: #4338ca;
+}

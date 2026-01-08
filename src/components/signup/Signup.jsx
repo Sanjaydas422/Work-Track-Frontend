@@ -1,8 +1,7 @@
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./Signup.css";
-import { Link, useNavigate } from "react-router-dom";
-import api from "../../api/api"; 
+import { useNavigate } from "react-router-dom";
+import api from "../../api/api";
 import { toast } from "react-toastify";
 
 const Signup = () => {
@@ -16,6 +15,28 @@ const Signup = () => {
   });
 
   const [loading, setLoading] = useState(false);
+  const [checkingRole, setCheckingRole] = useState(true);
+
+  // 🔐 ADMIN CHECK (VERY IMPORTANT)
+  useEffect(() => {
+    const verifyAdmin = async () => {
+      try {
+        const res = await api.get("/admin_app/current_user/");
+        if (res.data.role !== "admin") {
+          toast.error("You are not authorized to create users");
+          navigate("/dashboard");
+        }
+      } catch {
+        toast.error("Session expired. Please login again.");
+        localStorage.clear();
+        navigate("/login");
+      } finally {
+        setCheckingRole(false);
+      }
+    };
+
+    verifyAdmin();
+  }, [navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -25,43 +46,57 @@ const Signup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Basic client-side validation
     const { name, email, mobile, password } = formData;
     if (!name || !email || !mobile || !password) {
-      toast.error("Please fill all fields.");
+      toast.error("Please fill all fields");
       return;
     }
 
     try {
       setLoading(true);
-      // Ensure the URL matches your Django route (trailing slash if your Django uses it)
-      const res = await api.post("/admin_app/signup", formData);
-      toast.success(res.data?.message || "Signup successful!");
+
+      const res = await api.post("/admin_app/signup/", formData);
+
+      toast.success(res.data?.message || "User created successfully");
       setFormData({ name: "", email: "", mobile: "", password: "" });
-      // optionally redirect to login
-      navigate("/login");
+
+      // ✅ BACK TO USERS LIST
+      navigate("/users");
+
     } catch (error) {
-      const msg = error.response?.data?.error || error.message || "Signup failed.";
+      const msg =
+        error.response?.data?.error ||
+        error.message ||
+        "Failed to create user";
       toast.error(msg);
     } finally {
       setLoading(false);
     }
   };
 
+  // ⏳ Wait until role is checked
+  if (checkingRole) return null;
+
   return (
     <div className="signupmain">
       <div className="signupcontainer">
+
         <div className="signup-left-section">
           <div className="signup-logo-box">
-            <img className="tron-logo" src="Component 180.png" alt="Tron Logo" />
+            <img
+              className="tron-logo"
+              src="Component 180.png"
+              alt="Tron Logo"
+            />
           </div>
         </div>
 
         <div className="signup-right-section">
           <div className="signup-form-card">
+
+            {/* 🔁 TEXT UPDATED */}
             <div className="signup-login-and-signup">
-              <p className="signupname">Sign Up</p>
-              <Link to="/login"><p className="inactive">Login</p></Link>
+              <p className="signupname">Create User</p>
             </div>
 
             <form onSubmit={handleSubmit}>
@@ -72,8 +107,7 @@ const Signup = () => {
                 onChange={handleChange}
                 type="text"
                 className="signup-input"
-                placeholder="Enter your name"
-                required
+                placeholder="Enter name"
               />
 
               <label className="signup-label">Email</label>
@@ -83,8 +117,7 @@ const Signup = () => {
                 onChange={handleChange}
                 type="email"
                 className="signup-input"
-                placeholder="Enter your email"
-                required
+                placeholder="Enter email"
               />
 
               <label className="signup-label">Mobile Number</label>
@@ -94,8 +127,7 @@ const Signup = () => {
                 onChange={handleChange}
                 type="tel"
                 className="signup-input"
-                placeholder="Enter your mobile number"
-                required
+                placeholder="Enter mobile number"
               />
 
               <label className="signup-label">Password</label>
@@ -105,16 +137,21 @@ const Signup = () => {
                 onChange={handleChange}
                 type="password"
                 className="signup-input password-input"
-                placeholder="Enter your password"
-                required
+                placeholder="Enter password"
               />
 
-              <button className="signupbutton" type="submit" disabled={loading}>
-                {loading ? "Registering..." : "Register"}
+              <button
+                className="signupbutton"
+                type="submit"
+                disabled={loading}
+              >
+                {loading ? "Creating..." : "Create User"}
               </button>
             </form>
+
           </div>
         </div>
+
       </div>
     </div>
   );

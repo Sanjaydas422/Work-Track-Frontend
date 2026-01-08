@@ -6,7 +6,7 @@ import "./Sidebar.css";
 const logoUrl = "/mnt/data/Screenshot 2025-11-24 103401.png";
 
 import { IoDocumentOutline, IoHomeOutline, IoSettingsOutline } from "react-icons/io5";
-import { FaRegUser } from "react-icons/fa";
+import { FaRegUser, FaUser } from "react-icons/fa";
 import { LuUsers } from "react-icons/lu";
 import { FaCrown } from "react-icons/fa6";
 import { RiPieChart2Fill } from "react-icons/ri";
@@ -32,15 +32,17 @@ export default function Sidebar() {
 
   const isAdmin = userRole === "admin" || userRole === "super_admin";
 
-  const logout = () => {
-    // basic logout behaviour (replace with your API call if needed)
-    localStorage.removeItem("access_token");
-    localStorage.removeItem("refresh_token");
-    localStorage.removeItem("user_role");
-    // optional: clear cookie if you set one
-    document.cookie = "jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-    navigate("/", { replace: true });
-  };
+const logout = async () => {
+  try {
+    await api.post("/admin_app/logout/", {
+      refresh: localStorage.getItem("refresh"),
+    });
+  } catch {}
+
+  localStorage.clear();
+  navigate("/login");
+};
+
 
   return (
     <aside className="sidebar-container" aria-label="Main sidebar">
@@ -54,7 +56,11 @@ export default function Sidebar() {
           <img className="menu-icon" src="Vector.svg" alt="" />
           <span className="menu-text">Dashboard</span>
         </NavLink>
-
+<NavLink to="/users" className={({ isActive }) => `menu-box ${isActive ? "active" : ""}`}>
+          {/* <FaRegUser className="menu-icon" /> */}
+          <FaUser className="menu-icon" />
+          <span className="menu-text">Users</span>
+        </NavLink>
         <NavLink to="/tasks" className={({ isActive }) => `menu-box ${isActive ? "active" : ""}`}>
           {/* <FaRegUser className="menu-icon" /> */}
           <IoDocumentOutline className="menu-icon" />

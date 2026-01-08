@@ -1,8 +1,8 @@
-// src/components/auth/Login.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../../api/api";
 import { toast } from "react-toastify";
+import { useLocation } from "react-router-dom";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -27,37 +27,56 @@ const Login = () => {
     }
 
     try {
-      setLoading(true);
-      // Ensure Django URL matches; recommended to use trailing slash
-      const res = await api.post("/admin_app/login", formData);
-      toast.success(res.data?.message || "Login successful");
+  setLoading(true);
 
-      // Save tokens / user as you need (example localStorage)
-// Save tokens / user
-      if (res.data?.access) localStorage.setItem("access", res.data.access);
-      if (res.data?.refresh) localStorage.setItem("refresh", res.data.refresh);
-      if (res.data?.user) localStorage.setItem("user", JSON.stringify(res.data.user));
+  const res = await api.post("/admin_app/login/", formData);
 
-      // ---------- ROLE BASED REDIRECT ----------
-      const role = res.data?.user?.role;
+  localStorage.setItem("access", res.data.access);
+  localStorage.setItem("refresh", res.data.refresh);
 
-      if (role === "admin" || role === "project_lead") {
-        navigate("/dashboard");     // Admin Dashboard
-      } else {
-        window.location.href = "http://localhost:5174/";
-      }
+  // 🔐 VERIFY USER FROM BACKEND
+  const me = await api.get("/admin_app/current_user/");
 
-    } catch (err) {
-      const msg = err.response?.data?.error || err.response?.data?.detail || err.message || "Login failed";
-      toast.error(msg);
-    } finally {
-      setLoading(false);
-    }
+  if (me.data.role !== "admin") {
+    toast.error("You are not authorized to access admin dashboard");
+    localStorage.clear();
+
+    // optional redirect to user app
+    window.location.href = "http://localhost:5174/";
+    return;
+  }
+
+  toast.success("Login successful");
+  navigate("/dashboard");
+
+} catch (err) {
+  const msg =
+    err.response?.data?.error ||
+    err.response?.data?.detail ||
+    err.message ||
+    "Login failed";
+  toast.error(msg);
+} finally {
+  setLoading(false);
+}
   };
+const location = useLocation();
+const shownRef = useRef(false);
+
+useEffect(() => {
+  if (
+    location.state?.reason === "signup-disabled" &&
+    !shownRef.current
+  ) {
+    toast.info("Login required. Only admins can create new users.");
+    shownRef.current = true;
+  }
+}, [location.state]);
 
   return (
     <div className="signupmain">
       <div className="signupcontainer">
+
         <div className="signup-left-section">
           <div className="signup-logo-box">
             <img className="tron-logo" src="Component 180.png" alt="Tron Logo" />
@@ -66,8 +85,11 @@ const Login = () => {
 
         <div className="signup-right-section">
           <div className="signup-form-card">
+
             <div className="signup-login-and-signup">
-              <Link to="/signup"><p className="inactive">Sign Up</p></Link>
+              <Link to="/signup">
+                <p className="inactive">Sign Up</p>
+              </Link>
               <p className="signupname">Login</p>
             </div>
 
@@ -80,7 +102,6 @@ const Login = () => {
                 type="email"
                 className="signup-input"
                 placeholder="Enter your email"
-                required
               />
 
               <label className="signup-label">Password</label>
@@ -91,15 +112,20 @@ const Login = () => {
                 type="password"
                 className="signup-input password-input"
                 placeholder="Enter your password"
-                required
               />
 
-              <button className="signupbutton" type="submit" disabled={loading}>
+              <button
+                className="signupbutton"
+                type="submit"
+                disabled={loading}
+              >
                 {loading ? "Logging in..." : "Login"}
               </button>
             </form>
+
           </div>
         </div>
+
       </div>
     </div>
   );
