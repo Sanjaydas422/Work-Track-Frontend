@@ -6,41 +6,45 @@ import api from "../../../api/api";
 
 const NewTask = () => {
   const navigate = useNavigate();
+
   const [loading, setLoading] = useState(false);
   const [users, setUsers] = useState([]);
 
   const [formData, setFormData] = useState({
     taskName: "",
     description: "",
-    assignedto: "",
+    assignedTo: "",
     dueDate: "",
     workingHours: "",
     priority: "",
   });
 
-  // ✅ FETCH CLEAN USER LIST
+  // 🔹 Fetch users
   useEffect(() => {
     const fetchUsers = async () => {
       try {
         const res = await api.get("/admin_app/users/list/");
         setUsers(res.data);
-      } catch {
+      } catch (error) {
         toast.error("Failed to load users");
       }
     };
     fetchUsers();
   }, []);
 
+  // 🔹 Handle input change
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  // 🔹 Submit task
   const handleSubmit = async () => {
     if (
       !formData.taskName ||
       !formData.priority ||
       !formData.dueDate ||
-      !formData.assignedto
+      !formData.assignedTo
     ) {
       toast.error("Please fill all required fields");
       return;
@@ -49,22 +53,23 @@ const NewTask = () => {
     setLoading(true);
 
     try {
-      const data = new FormData();
-      data.append("task-name", formData.taskName);
-      data.append("description", formData.description);
-      data.append("due-date", formData.dueDate);
-      data.append("working-hours", formData.workingHours);
-      data.append("priority", formData.priority);
-      data.append("status", "Pending");
-      data.append("assigned-to", formData.assignedto);
+      const payload = {
+        task_name: formData.taskName,
+        description: formData.description,
+        due_date: formData.dueDate,
+        working_hours: Number(formData.workingHours || 0),
+        priority: formData.priority,
+        status: "Pending",
+        assigned_to: [Number(formData.assignedTo)],
+      };
 
-      const res = await api.post("/admin_app/add_tasks", data);
+      const res = await api.post("/admin_app/add_tasks/", payload);
 
       if (res.status === 201) {
         toast.success("Task added successfully");
         navigate("/tasks");
       }
-    } catch {
+    } catch (error) {
       toast.error("Failed to add task");
     } finally {
       setLoading(false);
@@ -76,6 +81,7 @@ const NewTask = () => {
       <div className="newtask-title">New Task</div>
 
       <div className="newtask-container">
+        {/* LEFT */}
         <div className="newtask-leftform">
           <label>Task Name *</label>
           <input
@@ -95,13 +101,13 @@ const NewTask = () => {
           />
         </div>
 
+        {/* RIGHT */}
         <div className="newtask-rightform">
           <label>Assigned To *</label>
-
           <select
-            name="assignedto"
+            name="assignedTo"
             className="newtask-input"
-            value={formData.assignedto}
+            value={formData.assignedTo}
             onChange={handleChange}
           >
             <option value="">Select User</option>
@@ -156,6 +162,7 @@ const NewTask = () => {
         <button className="cancel-btn" onClick={() => navigate("/tasks")}>
           Cancel
         </button>
+
         <button className="save-btn" onClick={handleSubmit} disabled={loading}>
           {loading ? "Saving..." : "Save"}
         </button>
